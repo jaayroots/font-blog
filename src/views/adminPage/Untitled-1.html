@@ -1,0 +1,288 @@
+<template>
+  <v-app id="inspire">
+    <sideBarAdmin></sideBarAdmin>
+    <v-navigation-drawer
+      app
+      class="pt-4"
+      color="#6B87C1"
+      variant
+    >
+    <p class="text-center">ระบบจัดการเว็ปไซต์ ตำบลโนนหอม</p>
+      <v-divider class="mx-8" inset horizontal></v-divider>
+      <v-card-actions></v-card-actions>
+        <v-row
+    align="center"
+    justify="space-around"
+  >
+    <v-btn text>
+      Normal
+    </v-btn>
+        </v-row>
+        <v-row
+    align="center"
+    justify="space-around"
+  >
+    <v-btn text>
+      Normal
+    </v-btn>
+        </v-row>
+      <!-- <v-avatar
+        v-for="n in 6"
+        :key="n"
+        :color="`red ${n === 1 ? 'darken' : 'lighten'}-1`"
+        :size="n === 1 ? 36 : 20"
+        class="d-block text-center mx-auto mb-9"
+      ></v-avatar> -->
+    </v-navigation-drawer>
+      <v-data-table
+    :headers="headers"
+    :items="desserts"
+    sort-by="calories"
+    class="elevation-1"
+  >
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-toolbar-title>ชุมชน</v-toolbar-title>
+        <v-divider class="mx-4" inset vertical></v-divider>
+        <v-spacer></v-spacer>
+        <v-dialog v-model="dialog">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+              สร้าง
+            </v-btn>
+          </template>
+          <v-card max-height="100%">
+            <v-card-title>
+              <span class="text-h5">{{ formTitle }}</span>
+            </v-card-title>
+
+            <v-card-text>
+              <v-container>
+                <v-row justify="center">
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="editedItem.contentName"
+                      label="หัวข้อ"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row justify="center">
+                  <v-col cols="12" sm="9" md="6">
+                    <v-text-field
+                      v-model="editedItem.contentPreview"
+                      label="เนื้อหาตัวอย่าง"
+                      counter="400"
+                    ></v-text-field>
+                    <v-file-input
+                    v-model="editedItem.photoCover"
+                      truncate-length="15"
+                      label="รูปภาพตัวอย่าง"
+                    ></v-file-input>
+                  </v-col>
+                </v-row>
+                <v-row justify="center">
+                  <v-col cols="12" sm="10" md="12">
+                    <vue-editor v-model="editedItem.contentDetail"></vue-editor>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeEditItem"> PreView </v-btn>
+              <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
+              <v-btn color="blue darken-1" text @click="saveAndUpdate"> Save </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-card>
+            <v-card-title class="justify-center"
+              ><h3>คุณต้องการลบเนื้อหานี้ ใช่หรือไม่</h3></v-card-title
+            >
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeDelete"
+                >ยกเลิก</v-btn
+              >
+              <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                >ตกลง</v-btn
+              >
+              <v-spacer></v-spacer>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-toolbar>
+    </template>
+    <template v-slot:item.actions="{ item }">
+      <v-icon small class="mr-2" @click="openEditItem(item)"> mdi-pencil </v-icon>
+      <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+    </template>
+    <template v-slot:no-data>
+    </template>
+  </v-data-table>
+  </v-app>
+</template>
+<script>
+import sideBarAdmin from '../../components/sideBarAdmin.vue'
+const axios = require('axios').default
+// import navBar from '../../components/navBar.vue'
+export default {
+  dialog: false,
+  dialogDelete: false,
+  name: 'RichTextEditPanel',
+
+  data: () => ({
+    items: [{ title: 'Dashboard', icon: 'mdi-view-dashboard' }, { title: 'Photos', icon: 'mdi-image' }, { title: 'About', icon: 'mdi-help-box' }],
+    content: '',
+    response: '',
+    formData: [],
+    dialog: false,
+    dialogDelete: false,
+    tmpDetailDelete: '',
+    headers: [
+      {
+        text: 'ลำดับ',
+        align: 'start',
+        sortable: false,
+        value: 'number'
+      },
+      { text: 'หัวข้อ', value: 'contentName' },
+      { text: 'ผู้สร้าง', value: 'createBy' },
+      { text: 'วันที่สร้าง', value: 'createDate' },
+      { text: 'ตัวเลือก', value: 'actions' }
+    ],
+    desserts: [],
+    editedIndex: -1,
+    editedItem: {
+      number: '',
+      id: '',
+      contentName: '',
+      contentPreview: '',
+      photoCover: [],
+      contentDetail: '',
+      createBy: 0,
+      createDate: 0
+    },
+    defaultItem: {
+      id: '',
+      contentName: '',
+      contentPreview: '',
+      photoCover: [],
+      contentDetail: '',
+      createBy: 0,
+      createDate: 0
+    }
+  }),
+  components: {
+    sideBarAdmin
+  },
+  computed: {
+    formTitle () {
+      return this.editedIndex === -1 ? 'สร้างเนื้อหา' : 'แก้ไขเนื้อหา'
+    }
+  },
+  watch: {
+    dialog (val) {
+      val || this.close()
+    },
+    dialogDelete (val) {
+      val || this.closeDelete()
+    }
+  },
+  async created () {
+    const resMenu = await axios.post('http://localhost:7000/api/menu/get-menu', {
+      typeMenu: 'admin'
+    }).then(function (response) {
+      return response
+      // const item = response.data.list[0]
+      // console.log(this.detail)
+      // console.log(typeof item.contentDetail)
+      // this.detail = item.contentDetail
+      // console.log(item.contentDetail)
+      // this.detail = item.contentDetail
+      // console.log(item.detail)
+    }).catch(function (error) {
+      console.log(error)
+    })
+    console.log(resMenu)
+    // this.menuPath = resMenu.data.list
+    axios.get('http://localhost:7000/api/news/get-news').then(resp => {
+      let number = 1
+      resp.data.list.forEach(item => {
+        item.number = number
+        number++
+      })
+      this.desserts = resp.data.list
+    })
+  },
+  methods: {
+    openEditItem (item) {
+      this.dialog = true
+      this.editedIndex = this.desserts.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+    },
+    closeEditItem (item) {
+      this.dialog = false
+    },
+
+    deleteItem (item) {
+      this.editedIndex = this.desserts.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.tmpDetailDelete = item.contentName
+      console.log(this.tmpDetailDelete)
+      this.dialogDelete = true
+    },
+
+    async deleteItemConfirm () {
+      await axios.post('http://localhost:7000/api/news/delete-news', {
+        id: this.desserts[this.editedIndex].id
+      }).then(function (response) {
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.fectData()
+      this.closeDelete()
+    },
+
+    close () {
+      this.dialog = false
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
+      })
+    },
+
+    closeDelete () {
+      this.dialogDelete = false
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
+      })
+    },
+
+    async saveAndUpdate () {
+      await axios.post('http://localhost:7000/api/news/createAndUpdate-news', {
+        item: this.editedItem
+      }).then(function (response) {
+      }).catch(function (error) {
+        console.log(error)
+      })
+      this.fectData()
+      this.close()
+    },
+
+    async fectData () {
+      axios.get('http://localhost:7000/api/news/get-news').then(resp => {
+        let number = 1
+        resp.data.list.forEach(item => {
+          item.number = number
+          number++
+        })
+        this.desserts = resp.data.list
+      })
+    }
+  }
+}
+</script>

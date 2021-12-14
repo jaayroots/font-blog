@@ -1,0 +1,61 @@
+<template>
+    <v-container>
+      <v-row align="center">
+        <v-img
+          max-height="9%"
+          max-width="9%"
+          src="https://nakawee.courseblue.com/wp-content/uploads/nonhorm.svg"
+        ></v-img>
+        <v-col class="d-flex justify-space-around">
+          <v-card max-width="90%" class="mx-auto">
+            <v-toolbar height="70%">
+              <v-toolbar-title>
+                <v-btn @click="staticURL()" target="_blank" text>
+                  <span class="mr-2">ชุมชน</span>
+                </v-btn>
+                <v-btn v-for="item in menuPath" :key="item.message" @click="$router.push(item.menuPath)" target="_blank" text>
+                  <span class="mr-2">{{item.nameMenu}}</span>
+                </v-btn>
+              </v-toolbar-title>
+            </v-toolbar>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+    <!-- <v-main>
+      <router-view></router-view>
+    </v-main> -->
+</template>
+<script>
+const axios = require('axios').default
+export default {
+  // name: 'App',
+  staticPath: 'www.google.com',
+  data: () => ({
+    // items: ['ชุมชน', 'แผนที่', 'เช็คอิน', 'ของฝาก', 'ติดต่อ'],
+    // menuPath: [{ nameMenu: 'ชุมชน', path: '/' }, { nameMenu: 'ข่าวสาร', path: 'news' }, { nameMenu: 'เช็คอิน', path: 'place' }, { nameMenu: 'ของฝาก', path: 'souvenir' }, { nameMenu: 'ติดต่อ', path: 'contect' }],
+    menuPath: [],
+    legacySystemHTML: '<h1 class="ql-align-center"><span class="ql-font-serif" style="color: rgb(255, 255, 255); background-color: rgb(240, 102, 102);"> I am snow example! </span></h1><p><br></p><h2 class="ql-align-right"><span style="background-color: rgb(230, 0, 0);">สวสัดีครับ ทดสอบภาษาไทย</span></h2><h2 class="ql-align-center"><span style="background-color: rgb(230, 0, 0);">สวสัดีครับ ทดสอบภาษาไทย</span></h2><h2><span style="background-color: rgb(230, 0, 0);">สวสัดีครับ ทดสอบภาษาไทย</span></h2><h2 class="ql-align-right"><br></h2>'
+
+  }),
+  components: {
+    // ToDoItem
+  },
+  methods: {
+    staticURL () {
+      window.open('https://nakawee.courseblue.com/?fbclid=IwAR1AzDwyZcbvpsPL6bomYrDJUR4USeGtP3zkcl3kEQ6N5OiQvxvCzJdtIpQ', '_blank')
+    }
+  },
+  async created () {
+    const resMenu = await axios.post('http://localhost:7000/api/menu/get-menu', {
+      typeMenu: 'normal'
+    }).then(function (response) {
+      return response
+    }).catch(function (error) {
+      console.log(error)
+    })
+    this.menuPath = resMenu.data.list
+  }
+}
+
+</script>
