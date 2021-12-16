@@ -8,6 +8,7 @@
 <script>
 import navBar from '../components/navBar.vue'
 import router from '../router'
+import https from '../plugins/https'
 const axios = require('axios').default
 export default {
   name: 'Page2',
@@ -30,7 +31,8 @@ export default {
     this.id = this.$route.params.id
     this.type = this.$route.params.type
     this.contentType = this.$route.params.contentType
-    const resContent = await axios.post('http://localhost:7000/api/content/get-content', {
+    
+    const resContent = await axios.post(https.baseConfig.Url.concat('content/get-content'), {
       id: this.id, type: this.type
     }).then(function (response) {
       return response
