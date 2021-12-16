@@ -27,6 +27,7 @@
     </v-main> -->
 </template>
 <script>
+import https from '../plugins/https'
 const axios = require('axios').default
 export default {
   // name: 'App',
@@ -47,7 +48,7 @@ export default {
     }
   },
   async created () {
-    const resMenu = await axios.post('http://localhost:7000/api/menu/get-menu', {
+    const resMenu = await axios.post(https.baseConfig.Url.concat('menu/get-menu'), {
       typeMenu: 'normal'
     }).then(function (response) {
       return response

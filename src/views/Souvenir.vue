@@ -3,7 +3,7 @@
     <nav-bar></nav-bar>
     <v-container>
       <v-row>
-        <v-col align="center"><h2>ข่าวสาร</h2> </v-col>
+        <v-col align="center"><h2>ของฝาก</h2> </v-col>
       </v-row>
       <v-card-actions></v-card-actions>
       <v-card
@@ -15,7 +15,7 @@
       >
         <v-list-item>
           <v-list-item-subtitle class="text-left">
-            <h3>ข่าวสารล่าสุด</h3>
+            <h3>ของฝากล่าสุด</h3>
           </v-list-item-subtitle>
         </v-list-item>
         <div v-for="data in contentList" :key="data.message">
@@ -29,7 +29,7 @@
             <v-col>
               <v-row>
                 <v-card width="15%">
-                  <v-img height="100%" v-bind:src="'http://localhost:7000/uploads/' + data.photoCover"></v-img>
+                  <v-img height="100%" v-bind:src="pathImg + data.photoCover"></v-img>
                 </v-card>
                 <v-col>
                   <v-card-text>
@@ -52,8 +52,8 @@
   </div>
 </template>
 <script>
-// import ToDoItem from '../image/cat.jpg'
 import navBar from '../components/navBar.vue'
+import https from '../plugins/https'
 const axios = require('axios').default
 export default {
   text: '',
@@ -64,14 +64,15 @@ export default {
     contentList: '',
     statusViewMore: false,
     defItem: 4,
-    moreItem: 8
+    moreItem: 8,
+    pathImg: https.baseConfig.imgPath
   }),
   components: {
     // ToDoItem
     navBar
   },
   async created () {
-    axios.get('http://localhost:7000/api/souvenir/get-souvenir').then(resp => {
+    axios.get(https.baseConfig.Url.concat('souvenir/get-souvenir')).then(resp => {
       let number = 1
       resp.data.list.forEach(item => {
         if (item.contentPreview.length > 350) {

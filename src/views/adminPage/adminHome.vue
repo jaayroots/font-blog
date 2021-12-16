@@ -77,6 +77,7 @@
   </v-app>
 </template>
 <script>
+import https from '../../plugins/https'
 import sideBarAdmin from '../../components/sideBarAdmin.vue'
 const axios = require('axios').default
 // import navBar from '../../components/navBar.vue'
@@ -147,7 +148,7 @@ export default {
     }
   },
   async created () {
-    axios.get('http://localhost:7000/api/home/get-home').then(resp => {
+    axios.get(https.baseConfig.Url.concat('home/get-home')).then(resp => {
       this.editedItem.contentDetail = resp.data.list[0].contentDetail
       this.editedItem.id = resp.data.list[0].id
     })
@@ -190,7 +191,7 @@ export default {
     },
 
     async deleteItemConfirm () {
-      await axios.post('http://localhost:7000/api/home/delete-home', {
+      await axios.post(https.baseConfig.Url.concat('home/delete-home'), {
         id: this.desserts[this.editedIndex].id
       }).then(function (response) {
       }).catch(function (error) {
@@ -217,8 +218,7 @@ export default {
     },
 
     async saveAndUpdate () {
-      // console.log(this.editedItem)
-      await axios.post('http://localhost:7000/api/home/createAndUpdate-home', {
+      await axios.post(https.baseConfig.Url.concat('home/createAndUpdate-home'), {
         item: this.editedItem
       }).then(function (response) {
       }).catch(function (error) {
@@ -229,7 +229,7 @@ export default {
     },
 
     async fectData () {
-      axios.get('http://localhost:7000/api/home/get-home').then(resp => {
+      axios.get(https.baseConfig.Url.concat('home/get-home')).then(resp => {
         let number = 1
         resp.data.list.forEach(item => {
           item.number = number

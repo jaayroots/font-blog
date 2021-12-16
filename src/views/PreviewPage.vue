@@ -30,8 +30,6 @@ export default {
     this.id = this.$route.params.id
     this.type = this.$route.params.type
     this.contentType = this.$route.params.contentType
-    console.log('USE ID FIND CONTENT')
-    // console.log(this.$route.params)
     const resContent = await axios.post('http://localhost:7000/api/content/get-content', {
       id: this.id, type: this.type
     }).then(function (response) {
@@ -39,7 +37,6 @@ export default {
     }).catch(function (error) {
       console.log(error)
     })
-    console.log(resContent.data.list[0])
     this.detail = resContent.data.list[0].contentDetail
   },
   methods: {

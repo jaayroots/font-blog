@@ -22,7 +22,6 @@ export default {
   }),
   components: {
     NavBar
-
   },
   methods: {
     onUpdate () {

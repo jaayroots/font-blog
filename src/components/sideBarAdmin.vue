@@ -20,6 +20,7 @@
     </v-navigation-drawer>
 </template>
 <script>
+import https from '../plugins/https'
 const axios = require('axios').default
 export default {
   dialog: false,
@@ -85,7 +86,7 @@ export default {
     }
   },
   async created () {
-    const resMenu = await axios.post('http://localhost:7000/api/menu/get-menu', {
+    const resMenu = await axios.post(https.baseConfig.Url.concat('menu/get-menu'), {
       typeMenu: 'admin'
     }).then(function (response) {
       return response
@@ -93,7 +94,7 @@ export default {
       console.log(error)
     })
     this.menuPath = resMenu.data.list
-    axios.get('http://localhost:7000/api/news/get-news').then(resp => {
+    axios.get(https.baseConfig.Url.concat('news/get-news')).then(resp => {
       let number = 1
       resp.data.list.forEach(item => {
         item.number = number
@@ -121,7 +122,7 @@ export default {
     },
 
     async deleteItemConfirm () {
-      await axios.post('http://localhost:7000/api/news/delete-news', {
+      await axios.post(https.baseConfig.Url.concat('news/delete-news'), {
         id: this.desserts[this.editedIndex].id
       }).then(function (response) {
       }).catch(function (error) {
@@ -148,7 +149,7 @@ export default {
     },
 
     async saveAndUpdate () {
-      await axios.post('http://localhost:7000/api/news/createAndUpdate-news', {
+      await axios.post(https.baseConfig.Url.concat('news/createAndUpdate-news'), {
         item: this.editedItem
       }).then(function (response) {
       }).catch(function (error) {
@@ -159,7 +160,7 @@ export default {
     },
 
     async fectData () {
-      axios.get('http://localhost:7000/api/news/get-news').then(resp => {
+      axios.get(https.baseConfig.Url.concat('news/get-news')).then(resp => {
         let number = 1
         resp.data.list.forEach(item => {
           item.number = number

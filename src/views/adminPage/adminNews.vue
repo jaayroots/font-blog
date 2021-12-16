@@ -106,6 +106,7 @@
 </template>
 <script>
 import sideBarAdmin from '../../components/sideBarAdmin.vue'
+import https from '../../plugins/https'
 const axios = require('axios').default
 // import navBar from '../../components/navBar.vue'
 export default {
@@ -177,7 +178,7 @@ export default {
     }
   },
   async created () {
-    axios.get('http://localhost:7000/api/news/get-news').then(resp => {
+    axios.get(https.baseConfig.Url.concat('news/get-news')).then(resp => {
       let number = 1
       resp.data.list.forEach(item => {
         item.number = number
@@ -227,7 +228,7 @@ export default {
     },
 
     async deleteItemConfirm () {
-      await axios.post('http://localhost:7000/api/news/delete-news', {
+      await axios.post(https.baseConfig.Url.concat('news/delete-news'), {
         id: this.desserts[this.editedIndex].id
       }).then(function (response) {
       }).catch(function (error) {
@@ -276,7 +277,7 @@ export default {
       const formData = new FormData()
       formData.append('file', this.Images)
       if (this.editedItem.id === '') {
-        await axios.post('http://localhost:7000/api/news/createAndUpdate-news', {
+        await axios.post(https.baseConfig.Url.concat('news/createAndUpdate-news'), {
           item: this.editedItem, image: this.Images.name
         }).then(function (response) {
           return response.data.ok[0]
@@ -287,10 +288,10 @@ export default {
         const formData = new FormData()
         formData.append('file', this.Images)
         const headers = { 'Content-Type': 'multipart/form-data' }
-        await axios.post('http://localhost:7000/api/content/uploadProfilePicture', formData, { headers }).then((res) => {
+        await axios.post(https.baseConfig.Url.concat('content/uploadProfilePicture'), formData, { headers }).then((res) => {
         })
       } else {
-        await axios.post('http://localhost:7000/api/news/createAndUpdate-news', {
+        await axios.post(https.baseConfig.Url.concat('news/createAndUpdate-news'), {
           item: this.editedItem
         }).then(function (response) {
         }).catch(function (error) {
@@ -301,7 +302,7 @@ export default {
       this.close()
     },
     async fectData () {
-      axios.get('http://localhost:7000/api/news/get-news').then(resp => {
+      axios.get(https.baseConfig.Url.concat('news/get-news')).then(resp => {
         let number = 1
         resp.data.list.forEach(item => {
           item.number = number
