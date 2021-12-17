@@ -105,8 +105,8 @@
   </v-app>
 </template>
 <script>
-import sideBarAdmin from '../../components/sideBarAdmin.vue'
-import https from '../../plugins/https'
+import sideBarAdmin from '../components/sideBarAdmin.vue'
+import https from '../plugins/https'
 const axios = require('axios').default
 // import navBar from '../../components/navBar.vue'
 export default {

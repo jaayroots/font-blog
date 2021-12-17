@@ -23,7 +23,6 @@ export default {
     }
   },
   components: {
-    // VJsoneditor
     navBar
   },
   async created () {
@@ -31,7 +30,6 @@ export default {
     this.id = this.$route.params.id
     this.type = this.$route.params.type
     this.contentType = this.$route.params.contentType
-    
     const resContent = await axios.post(https.baseConfig.Url.concat('content/get-content'), {
       id: this.id, type: this.type
     }).then(function (response) {
