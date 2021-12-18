@@ -148,6 +148,9 @@ import https from '../plugins/https'
 const axios = require('axios').default
 
 export default {
+  mounted () {
+    document.title = 'ตำบลบ้านโนนหอม'
+  },
   data: () => ({
     contentDetail: '',
     statusViewMore: false,
