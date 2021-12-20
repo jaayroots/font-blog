@@ -1,22 +1,16 @@
 <template>
-  <v-container>
-    <v-row align="center">
+  <div align="center">
       <v-img
-        max-height="9%"
-        max-width="9%"
-        src="https://nakawee.courseblue.com/wp-content/uploads/nonhorm.svg"
+        max-height="100%"
+        max-width="100%"
+        v-bind:src="pathImg + 'header.jpg'"
       ></v-img>
+      <v-card-actions></v-card-actions>
+      <v-row align="center">
       <v-col class="d-flex justify-space-around">
         <v-card max-width="90%" class="mx-auto">
           <v-toolbar height="70%">
             <v-toolbar-title>
-              <!-- <v-btn @click="staticURL()" target="_blank" text>
-                  <span class="mr-2">ชุมชน</span>
-                </v-btn>
-                <v-btn v-for="item in menuPath" :key="item.message" @click="$router.push(item.menuPath)" target="_blank" text>
-                  <span class="mr-2">{{item.nameMenu}}</span>
-                </v-btn> -->
-              <!-- <v-sheet class="mx-auto" max-width="700"> -->
                 <v-slide-group multiple show-arrows>
                   <v-slide-item
                     v-for="item in menuPath"
@@ -36,10 +30,7 @@
         </v-card>
       </v-col>
     </v-row>
-  </v-container>
-  <!-- <v-main>
-      <router-view></router-view>
-    </v-main> -->
+  </div>
 </template>
 <script>
 import https from '../plugins/https'
@@ -50,7 +41,8 @@ export default {
   data: () => ({
     // items: ['ชุมชน', 'แผนที่', 'เช็คอิน', 'ของฝาก', 'ติดต่อ'],
     // menuPath: [{ nameMenu: 'ชุมชน', path: '/' }, { nameMenu: 'ข่าวสาร', path: 'news' }, { nameMenu: 'เช็คอิน', path: 'place' }, { nameMenu: 'ของฝาก', path: 'souvenir' }, { nameMenu: 'ติดต่อ', path: 'contect' }],
-    menuPath: []
+    menuPath: [],
+    pathImg: https.baseConfig.imgPath
   }),
   components: {
     // ToDoItem

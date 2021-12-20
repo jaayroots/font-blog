@@ -1,9 +1,9 @@
 <template>
-  <div id="News">
+  <div id="place">
     <nav-bar></nav-bar>
     <v-container>
       <v-row>
-        <v-col align="center"><h2>ข่าวสาร</h2> </v-col>
+        <v-col align="center"><h2>เช็คอิน</h2> </v-col>
       </v-row>
       <v-card-actions></v-card-actions>
       <v-card
@@ -15,7 +15,7 @@
       >
         <v-list-item>
           <v-list-item-subtitle class="text-left">
-            <h3>ข่าวสารล่าสุด</h3>
+            <h3 >สถานที่ใหม่</h3>
           </v-list-item-subtitle>
         </v-list-item>
         <div v-for="data in contentList" :key="data.message">
@@ -23,7 +23,7 @@
             class="mx-auto"
             max-width="100%"
             color="#D4D4D4"
-            @click="$router.push({ name: 'PreviewPage', contentName: 'news', params: { id: data.id, type: 'news' }}) "
+            @click="$router.push({ name: 'PreviewPage', contentName: 'place', params: { id: data.id, type: 'place' }}) "
             target="_blank"
           >
             <v-col>
@@ -55,8 +55,8 @@
 <script>
 // import ToDoItem from '../image/cat.jpg'
 import navBar from '../components/navBar.vue'
-import footerBar from '../components/footer.vue'
 import https from '../plugins/https'
+import footerBar from '../components/footer.vue'
 const axios = require('axios').default
 export default {
   text: '',
@@ -76,7 +76,7 @@ export default {
     footerBar
   },
   async created () {
-    axios.get(https.baseConfig.Url.concat('news/get-news')).then(resp => {
+    axios.get(https.baseConfig.Url.concat('place/get-place')).then(resp => {
       let number = 1
       resp.data.list.forEach(item => {
         if (item.contentPreview.length > 350) {

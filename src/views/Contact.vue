@@ -68,7 +68,7 @@ export default {
   watch: {
   },
   async created () {
-    axios.get(https.baseConfig.Url.concat('place/get-place')).then(resp => {
+    axios.get(https.baseConfig.Url.concat('contact/get-contact')).then(resp => {
       this.contentDetail = resp.data.list[0].contentDetail
     })
   }

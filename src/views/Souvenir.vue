@@ -49,11 +49,13 @@
         <v-card-actions></v-card-actions>
       </v-card>
     </v-container>
+    <footer-bar></footer-bar>
   </div>
 </template>
 <script>
 import navBar from '../components/navBar.vue'
 import https from '../plugins/https'
+import footerBar from '../components/footer.vue'
 const axios = require('axios').default
 export default {
   text: '',
@@ -69,7 +71,8 @@ export default {
   }),
   components: {
     // ToDoItem
-    navBar
+    navBar,
+    footerBar
   },
   async created () {
     axios.get(https.baseConfig.Url.concat('souvenir/get-souvenir')).then(resp => {

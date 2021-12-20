@@ -1,56 +1,56 @@
 <template>
   <v-app>
     <sideBarAdmin></sideBarAdmin>
-    <v-card max-height="100%">
+    <v-data-table
+      :headers="headers"
+      :items="desserts"
+      sort-by="calories"
+      class="elevation-1"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title>ข่าวสาร</v-toolbar-title>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-dialog v-model="dialog">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+                สร้าง
+              </v-btn>
+            </template>
+            <v-card max-height="100%">
               <v-card-title>
                 <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
 
-              <v-card-text height="">
+              <v-card-text>
                 <v-container>
-                  <!-- <v-row justify="center">
+                  <v-row justify="center">
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.contentName"
                         label="หัวข้อ"
                       ></v-text-field>
                     </v-col>
-                  </v-row> -->
-                  <!-- <v-row justify="center">
+                  </v-row>
+                  <v-row justify="center">
                     <v-col cols="12" sm="9" md="6">
                       <v-text-field
                         v-model="editedItem.contentPreview"
                         label="เนื้อหาตัวอย่าง"
                         counter="400"
                       ></v-text-field>
-                      <v-file-input
-                    v-model="editedItem.photoCover"
-                      truncate-length="15"
-                      label="รูปภาพตัวอย่าง"
-                      @change="onFileChange"
-                    ></v-file-input>
-                      <div v-if="!image">
+                      <div v-if="!editedItem.id">
                         <v-row justify="center">
                         <h2>เลือกรูปภาพตัวอย่าง</h2>
                         <v-card-actions></v-card-actions>
                         </v-row>
                         <v-row justify="center">
-                          <input type="file" @change="onFileChange" />
-                        </v-row>
-                      </div>
-                      <div v-else>
-                        <v-row justify="center">
-                          <img :src="image" height="40%" width="40%" />
-                        </v-row>
-                        <v-row justify="center">
-                          <button @click="removeImage">Remove image</button>
-                        </v-row>
-                        <v-row justify="center">
-                          <input type="file" @change="onFileChange" />
+                          <input type="file" @change="uploadFile" ref="file" />
                         </v-row>
                       </div>
                     </v-col>
-                  </v-row> -->
+                  </v-row>
                   <v-row justify="center">
                     <v-col cols="12" sm="10" md="12">
                       <vue-editor
@@ -63,16 +63,50 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
+                <!-- <v-btn color="blue darken-1" text @click="closeEditItem">
+                  PreView
+                </v-btn> -->
+                <v-btn color="blue darken-1" text @click="close">
+                  ยกเลิก
+                </v-btn>
                 <v-btn color="blue darken-1" text @click="saveAndUpdate">
                   บันทึก
                 </v-btn>
               </v-card-actions>
             </v-card>
+          </v-dialog>
+          <v-dialog v-model="dialogDelete" max-width="500px">
+            <v-card>
+              <v-card-title class="justify-center"
+                ><h3>คุณต้องการลบเนื้อหานี้ ใช่หรือไม่</h3></v-card-title
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeDelete"
+                  >ยกเลิก</v-btn
+                >
+                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                  >ตกลง</v-btn
+                >
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-icon small class="mr-2" @click="openEditItem(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+      </template>
+      <template v-slot:no-data> </template>
+    </v-data-table>
   </v-app>
 </template>
 <script>
-import https from '../../plugins/https'
 import sideBarAdmin from '../../components/sideBarAdmin.vue'
+import https from '../../plugins/https'
 const axios = require('axios').default
 // import navBar from '../../components/navBar.vue'
 export default {
@@ -87,6 +121,7 @@ export default {
     files: '',
     formData: '',
     response: '',
+    imageId: '',
     // formData: [],
     dialog: false,
     dialogDelete: false,
@@ -113,7 +148,8 @@ export default {
       photoCover: [],
       contentDetail: '',
       createBy: 0,
-      createDate: 0
+      createDate: 0,
+      getDate: Date.now()
     },
     defaultItem: {
       id: '',
@@ -130,7 +166,7 @@ export default {
   },
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'สร้างเนื้อหาสำหรับชุมชน' : 'แก้ไขเนื้อหา'
+      return this.editedIndex === -1 ? 'สร้างเนื้อหา' : 'แก้ไขเนื้อหา'
     }
   },
   watch: {
@@ -142,12 +178,19 @@ export default {
     }
   },
   async created () {
-    axios.get(https.baseConfig.Url.concat('place/get-place')).then(resp => {
-      this.editedItem.contentDetail = resp.data.list[0].contentDetail
-      this.editedItem.id = resp.data.list[0].id
+    axios.get(https.baseConfig.Url.concat('news/get-news')).then(resp => {
+      let number = 1
+      resp.data.list.forEach(item => {
+        item.number = number
+        number++
+      })
+      this.desserts = resp.data.list
     })
   },
   methods: {
+    uploadFile () {
+      this.Images = this.$refs.file.files[0]
+    },
     onFileChange (e) {
       var files = e.target.files || e.dataTransfer.files
       this.file = this.$refs.file.files[0]
@@ -185,7 +228,7 @@ export default {
     },
 
     async deleteItemConfirm () {
-      await axios.post(https.baseConfig.Url.concat('place/delete-place'), {
+      await axios.post(https.baseConfig.Url.concat('news/delete-news'), {
         id: this.desserts[this.editedIndex].id
       }).then(function (response) {
       }).catch(function (error) {
@@ -212,18 +255,54 @@ export default {
     },
 
     async saveAndUpdate () {
-      await axios.post(https.baseConfig.Url.concat('place/createAndUpdate-place'), {
-        item: this.editedItem
-      }).then(function (response) {
-      }).catch(function (error) {
-        console.log(error)
-      })
+      if (this.editedItem.contentName === '') {
+        this.$swal('กรุณาใส่หัวข้อ')
+        return
+      }
+      if (this.editedItem.contentPreview === '') {
+        this.$swal('กรุณาใส่เนื้อหาตัวอย่าง')
+        return
+      }
+      // console.log(this.editedItem.contentDetail)
+      // console.log(this.editedItem.id)
+      if (this.editedItem.contentDetail === '') {
+        this.$swal('กรุณาใส่เนื้อหา')
+        return
+      }
+      if (this.Images === undefined && this.editedItem.id === '') {
+        this.$swal('กรุณาเลือกรูปภาพปก (.jpg)')
+        return
+      }
+      // check Detail
+      const formData = new FormData()
+      formData.append('file', this.Images)
+      if (this.editedItem.id === '') {
+        await axios.post(https.baseConfig.Url.concat('news/createAndUpdate-news'), {
+          item: this.editedItem, image: this.Images.name
+        }).then(function (response) {
+          return response.data.ok[0]
+        }).catch(function (error) {
+          console.log(error)
+        })
+        // Picture
+        const formData = new FormData()
+        formData.append('file', this.Images)
+        const headers = { 'Content-Type': 'multipart/form-data' }
+        await axios.post(https.baseConfig.Url.concat('content/uploadProfilePicture'), formData, { headers }).then((res) => {
+        })
+      } else {
+        await axios.post(https.baseConfig.Url.concat('news/createAndUpdate-news'), {
+          item: this.editedItem
+        }).then(function (response) {
+        }).catch(function (error) {
+          console.log(error)
+        })
+      }
       this.fectData()
       this.close()
     },
-
     async fectData () {
-      axios.get(https.baseConfig.Url.concat('place/get-place')).then(resp => {
+      axios.get(https.baseConfig.Url.concat('news/get-news')).then(resp => {
         let number = 1
         resp.data.list.forEach(item => {
           item.number = number

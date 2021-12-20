@@ -4,7 +4,7 @@
     <v-container>
       <v-col align="center">
         <!-- <v-container><div v-html="contentDetail"></div> </v-container> -->
-        <v-container>
+        <!-- <v-container>
           <v-row>
             <v-col cols="12" sm="2">
               <v-sheet rounded="lg" min-height="268">
@@ -14,18 +14,12 @@
 
             <v-col cols="12" sm="8">
               <v-sheet min-height="70vh" rounded="lg">
-                <v-container><div v-html="contentDetail"></div> </v-container>
-                <!--  -->
-              </v-sheet>
-            </v-col>
-
-            <v-col cols="12" sm="2">
-              <v-sheet rounded="lg" min-height="268">
-
+                <v-container><div width="100%" v-html="contentDetail"></div> </v-container>
               </v-sheet>
             </v-col>
           </v-row>
-        </v-container>
+        </v-container> -->
+        <v-container><div width="100%" v-html="contentDetail"></div> </v-container>
       </v-col>
       <v-card
         class="mx-auto"
@@ -140,10 +134,12 @@
         <v-card-actions></v-card-actions>
       </v-card>
     </v-container>
+    <footer-bar></footer-bar>
   </div>
 </template>
 <script>
 import navBar from '../components/navBar.vue'
+import footerBar from '../components/footer.vue'
 import https from '../plugins/https'
 const axios = require('axios').default
 
@@ -178,7 +174,8 @@ export default {
   listAllNews: [],
   listAllSouvenir: [],
   components: {
-    navBar
+    navBar,
+    footerBar
   },
   watch: {
   },
