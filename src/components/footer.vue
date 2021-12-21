@@ -8,7 +8,7 @@
     <v-img
       max-height="100%"
       max-width="100%"
-      v-bind:src="pathImg + 'footer.jpg'"
+      v-bind:src="pathImg + 'footer.png'"
     ></v-img>
   </div>
 </template>

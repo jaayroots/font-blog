@@ -2,12 +2,14 @@
     <div class="hello">
       <nav-bar></nav-bar>
       <v-container><div v-html="detail" align="center"></div></v-container>
+    <footer-bar></footer-bar>
     </div>
 </template>
 
 <script>
-import navBar from '../components/navBar.vue'
+import navBar from '../components/navBarPreview.vue'
 import router from '../router'
+import footerBar from '../components/footer.vue'
 import https from '../plugins/https'
 const axios = require('axios').default
 export default {
@@ -23,7 +25,8 @@ export default {
     }
   },
   components: {
-    navBar
+    navBar,
+    footerBar
   },
   async created () {
     this.cosId = this.$route.params.id
