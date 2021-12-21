@@ -12,8 +12,10 @@
           <v-toolbar height="70%">
             <v-toolbar-title>
               <v-slide-group multiple show-arrows>
+                <!-- <v-slide-item v-for="item in menuPath" :key="item.message"> -->
                 <v-slide-item v-for="(item, index) in menuPath" :key="index">
                   <v-btn class="mx-1" @click="$router.push(index==0? '/':'/'+item.menuPath)">
+                    {{ item.nameMenu }}
                   </v-btn>
                 </v-slide-item>
               </v-slide-group>
