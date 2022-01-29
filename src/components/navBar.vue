@@ -30,16 +30,12 @@
 import https from '../plugins/https'
 const axios = require('axios').default
 export default {
-  // name: 'App',
   staticPath: 'www.google.com',
   data: () => ({
-    // items: ['ชุมชน', 'แผนที่', 'เช็คอิน', 'ของฝาก', 'ติดต่อ'],
-    // menuPath: [{ nameMenu: 'ชุมชน', path: '/' }, { nameMenu: 'ข่าวสาร', path: 'news' }, { nameMenu: 'เช็คอิน', path: 'place' }, { nameMenu: 'ของฝาก', path: 'souvenir' }, { nameMenu: 'ติดต่อ', path: 'contect' }],
     menuPath: [],
     pathImg: https.baseConfig.imgPath
   }),
   components: {
-    // ToDoItem
   },
   methods: {
     staticURL () {
@@ -57,5 +53,4 @@ export default {
     this.menuPath = resMenu.data.list
   }
 }
-
 </script>
